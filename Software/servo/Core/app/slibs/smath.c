@@ -3,8 +3,15 @@
  * @attention only for MCUs without FPU(like STM32F103), for MCUs with FPU, use the standard math library instead. It's actually faster.
 */
 #include "smath.h"
+#include <stdint.h>
 
 #ifndef __FPU_PRESENT
+float s_mod(float x, float y){
+    if (y == 0) return NAN; // handle division by zero
+    float mod = x - y * (int)(x / y);
+    return mod;
+}
+
 float s_inv_sqrt(float x){
     long i;  
     float x2, y;  
@@ -53,9 +60,9 @@ float s_sin(float x){
     else{
         while(x > TWO_PI) x -= TWO_PI;
     }
-    int8_t sign = 1;
+    uint8_t sign = 0;
     if (x > PI){
-        sign = -1;
+        sign = 1;
         x -= PI;
     }
     x = x > HALF_PI? (PI - x) : x;
@@ -72,7 +79,7 @@ float s_sin(float x){
 
     float y = sin_table_rad[idx_low] * (1.0f - t) + sin_table_rad[idx_high] * t;
     
-    return sign * y;
+    return sign ? -y : y;
 }
 
 float s_cos(float x){
@@ -81,41 +88,71 @@ float s_cos(float x){
 
 float s_tan(float x){
     //TODO: approximate
-    return s_sin(x) / s_cos(x);
+    if (x < 0){
+        while(x < 0) x += PI;
+    }
+    else{
+        while(x > PI) x -= PI;
+    }
+    uint8_t sign = 0;
+    if (x > HALF_PI){
+        sign = 1;
+        x = PI - x;
+    }
+	if (x < QUART_PI){
+        float x2 = x * x;
+        float res = x * (1.0f + x2 * (0.33333333f + x2 * (0.13333333f + 0.05396825397f * x2)));
+		return sign ? -res : res;
+    }
+	else{
+		float m = HALF_PI - x;
+		float m2 = m * m;
+        float res = 1.0f / (m * (1.0f + m2 * (0.33333333f + m2 * (0.13333333f + 0.05396825397f * m2))));
+		return sign ? -res : res;
+    }
 }
 
-float s_asin(float x){
-    //TODO
-}
-
-float s_acos(float x){
-    //TODO
-}
 
 float s_atan(float x){
     if (x > 1.0f) {
-        return HALF_PI - s_atan(1.0f / x);
+        float inv_x = 1.0f / x;
+        return HALF_PI - (inv_x * QUART_PI + 0.273082f * inv_x * (1.0f - ABS(inv_x)));
     } else if (x < -1.0f) {
-        return -HALF_PI - s_atan(1.0f / x);
+        float inv_x = 1.0f / x;
+        return -HALF_PI - (inv_x * QUART_PI + 0.273082f * inv_x * (1.0f - ABS(inv_x)));
     }
     return x * QUART_PI + 0.273082f * x * (1.0f - ABS(x));
 }
 
+float s_asin(float x){
+    float i = ABS(x);
+    if (i >= 1.0f) return (x > 0) ? HALF_PI : -HALF_PI;
+    if (i < 0.7f)
+        return (3 * x) / (2 + s_sqrt(1.0f - x * x));
+    else {
+        float m = 1.0f - i;
+        float res = HALF_PI - (SQRT2 * s_sqrt(m) * (1 + 0.833333f * m));
+        return (x < 0) ? -res : res;
+    }
+}
+
+float s_acos(float x){
+    if (x >= 1.0f) return 0;
+    if (x <= -1.0f) return PI;
+    return HALF_PI - s_asin(x);
+}
+
 float s_atan2(float y, float x){
     float ratio = y / x; 
-    float result;
-    
     if (x > 0) {
-        result = s_atan(ratio);
+        return s_atan(ratio);
     } 
     else if (x < 0) {
-        result = s_atan(ratio);
-        result += (y >= 0) ? PI : -PI;
+        return s_atan(ratio) + ((y < 0) ? -PI : PI);
     } 
     else {  // x == 0
-        result = (y > 0) ? HALF_PI : (y < 0) ? -HALF_PI : 0.0f;
+        return (y > 0) ? HALF_PI : (y < 0) ? -HALF_PI : 0.0f;
     }
-    return result;
 }
 
 #else
