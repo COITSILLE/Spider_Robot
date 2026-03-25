@@ -17,7 +17,7 @@ Vec3_t ik_3DOF_get(Vec3_t target, ik_3DOF_Params_t params, ik_3DOF_RootConfig_t 
     if (ABS(m3) > 1.0f){
         return (Vec3_t){NAN, NAN, NAN}; 
     }
-    float a3 = root_config == DOWN ? s_acos(m3) : -s_acos(m3);
+    float a3 = root_config == DOWN ? -s_acos(m3) : s_acos(m3);
     
     float a2 = s_atan2(target.z, x_) - s_atan2(params.l3 * s_sin(a3), (params.l2 + params.l3 * s_cos(a3)));
 
