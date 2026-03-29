@@ -14,7 +14,11 @@ bool PWM_PCA9685::readReg(uint8_t reg, uint8_t *val)
 {
     return HAL_I2C_Mem_Read(hi2c_, dev_addr_ << 1, reg, I2C_MEMADD_SIZE_8BIT, val, 1, 100) == HAL_OK;
 }
-void PWM_PCA9685::init(float pwm_freq)
+bool PWM_PCA9685::writeRegs(uint8_t reg, uint8_t *data, uint8_t len)
+{
+    return HAL_I2C_Mem_Write(hi2c_, dev_addr_ << 1, reg, I2C_MEMADD_SIZE_8BIT, data, len, 100) == HAL_OK;
+}
+bool PWM_PCA9685::init(float pwm_freq)
 {
     pwm_freq_ = pwm_freq;
     if (global_initialized_)
@@ -22,7 +26,7 @@ void PWM_PCA9685::init(float pwm_freq)
         return true;
     }
     float prescale_val = osc_freq_ / (4096.0f * pwm_freq_);
-    uint8_t prescale = (uint8_t)(prescale_val + 0.5f) - 1
+    uint8_t prescale = (uint8_t)(prescale_val + 0.5f) - 1;
     if (prescale < 3) prescale = 3;
 
     if (!writeReg(0x00, 0x00)) return false;
