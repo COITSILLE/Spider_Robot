@@ -1,8 +1,7 @@
-#ifndef APP_CPP_PWM_PWM_PCA9685_H
-#define APP_CPP_PWM_PWM_PCA9685_H
+#pragma once
 
 #include "pwm.h"
-#include "stm32f1xx_hal.h"
+#include "main.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +29,5 @@ private:
    static bool writeReg(I2C_HandleTypeDef *hi2c, uint8_t addr, uint8_t reg, uint8_t val);
    static bool writeRegs(I2C_HandleTypeDef *hi2c, uint8_t addr, uint8_t reg, uint8_t *data, uint8_t len);
    static bool readReg(I2C_HandleTypeDef *hi2c, uint8_t addr, uint8_t reg, uint8_t val);
-   }
+};
 #endif /* __cplusplus */
-
-#endif /* APP_CPP_PWM_PWM_PCA9685_H */

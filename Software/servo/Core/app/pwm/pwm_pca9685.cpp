@@ -1,5 +1,5 @@
 #include "pwm_pca9685.h"
-#include "smath.h"
+
 bool PWM_PCA9685::global_initialized_ = false;
 
 PWM_PCA9685::PWM_PCA9685(I2C_HandleTypeDef *i2c,uint8_t addr, uint8_t channel, float osc_freq)
