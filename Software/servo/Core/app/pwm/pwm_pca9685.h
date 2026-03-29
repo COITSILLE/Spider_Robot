@@ -3,11 +3,7 @@
 #include "pwm.h"
 #include "main.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-#ifdef __cplusplus
-}
+
 
 class PWM_PCA9685 : public PWM<PWM_PCA9685> {
 public:
