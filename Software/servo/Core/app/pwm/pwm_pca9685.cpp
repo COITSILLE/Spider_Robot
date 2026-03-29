@@ -22,7 +22,7 @@ bool PWM_PCA9685::init(float pwm_freq)
         return true;
     }
     float prescale_val = osc_freq_ / (4096.0f * pwm_freq_);
-    uint8_t prescale = (uint8_t)(prescale_val + 0.5f) - 1
+    uint8_t prescale = (uint8_t)(prescale_val + 0.5f) - 1;
     if (prescale < 3) prescale = 3;
 
     if (!writeReg(0x00, 0x00)) return false;
