@@ -14,6 +14,10 @@ bool PWM_PCA9685::readReg(uint8_t reg, uint8_t *val)
 {
     return HAL_I2C_Mem_Read(hi2c_, dev_addr_ << 1, reg, I2C_MEMADD_SIZE_8BIT, val, 1, 100) == HAL_OK;
 }
+bool PWM_PCA9685::writeRegs(uint8_t reg, uint8_t *data, uint8_t len)
+{
+    return HAL_I2C_Mem_Write(hi2c_, dev_addr_ << 1, reg, I2C_MEMADD_SIZE_8BIT, data, len, 100) == HAL_OK;
+}
 bool PWM_PCA9685::init(float pwm_freq)
 {
     pwm_freq_ = pwm_freq;
